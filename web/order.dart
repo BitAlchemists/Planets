@@ -1,9 +1,10 @@
 part of planets;
 
 class Order {
-  Body source;
-  Body target;
+  Player issuer;
+  Planet source;
+  Planet destination;
   int unitCount;
   
-  Order(this.source, this.target, this.unitCount);
+  Order(this.issuer, this.source, this.destination, this.unitCount);
 }

@@ -5,9 +5,12 @@ import 'package:stagexl/stagexl.dart';
 import 'dart:math' as math;
 
 part 'game.dart';
-part 'body.dart';
+part 'planet.dart';
 part 'player.dart';
 part 'order.dart';
+part 'ship.dart';
+part 'strategy.dart';
+part 'strategies/all_in_strategy.dart';
 
 Stage stage;
 RenderLoop renderLoop;

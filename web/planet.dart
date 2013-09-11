@@ -1,15 +1,16 @@
 part of planets;
 
-class Body extends Sprite
+class Planet extends Sprite
 {
   TextField _pointsTextField;
   Shape _shape;
+  num radius;
   
-  int _value;
-  int get value => _value;
-      set value(int value){
+  num _value;
+  num get value => _value;
+      set value(num value){
         _value = value;
-        _pointsTextField.text = value.toString();
+        _pointsTextField.text = value.toInt().toString();
       }
   
   Player _owner;
@@ -19,11 +20,14 @@ class Body extends Sprite
     _shape.graphics.fillColor(owner.color);
   }
       
-  Body(num x, num y, num radius) {
+  Planet(x, y, this.radius) {
     _value = 0;
+    
+    this.x = x;
+    this.y = y;
 
     _shape = new Shape();
-    _shape.graphics.circle(x, y, radius);
+    _shape.graphics.circle(0, 0, radius);
     _shape.graphics.fillColor(Color.LightGray);
     
     SimpleButton button = new SimpleButton(_shape, _shape, _shape, _shape);
@@ -35,8 +39,8 @@ class Body extends Sprite
     _pointsTextField.height = radius*2;
     _pointsTextField.wordWrap = false;
     //_pointsTextField.selectable = false;
-    _pointsTextField.x = x-radius;
-    _pointsTextField.y = y-radius;
+    _pointsTextField.x = 0-radius;
+    _pointsTextField.y = 0-radius;
     //_pointsTextField.filters = [new GlowFilter(0x000000, 1.0, 2, 2)];
     _pointsTextField.mouseEnabled = false;
     _pointsTextField.text = "0";
