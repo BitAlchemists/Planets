@@ -1,7 +1,7 @@
 part of planets;
 
-class AllInStrategy implements Strategy{
-  AllInStrategy();
+class Strategy2 implements Strategy{
+  Strategy2();
   
   List<Order> generateOrders(Player player, Game game){
     
@@ -21,7 +21,11 @@ class AllInStrategy implements Strategy{
       List<Planet> myPlanets = game.ownerships([player])[player];   
       if(myPlanets != null)
       {
-        myPlanets.forEach((Planet myBody) => orders.add(new Order(player, myBody, body, myBody.value.toInt())));
+        myPlanets.forEach((Planet myBody){
+          if(myBody.value > 5){
+            orders.add(new Order(player, myBody, body, myBody.value.toInt()-5));             
+          }
+        });
       }
       else
       {

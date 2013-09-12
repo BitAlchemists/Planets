@@ -33,7 +33,7 @@ class Game extends Sprite implements Animatable{
       bodies.add(body);
     }
     
-    Strategy strategy = new AllInStrategy();
+    Strategy strategy = new Strategy2();
 
     players = [new Player("Player 1", Color.Red, strategy), new Player("Player 2", Color.Blue, strategy), new Player("Player 3", Color.Green, strategy)];
     for(int i = 0; i < players.length; i++) {

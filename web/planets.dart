@@ -11,6 +11,7 @@ part 'order.dart';
 part 'ship.dart';
 part 'strategy.dart';
 part 'strategies/all_in_strategy.dart';
+part 'strategies/strategy2.dart';
 
 Stage stage;
 RenderLoop renderLoop;
