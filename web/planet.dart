@@ -6,10 +6,10 @@ class Planet extends Sprite
   Shape _shape;
   num radius;
   
-  num _value;
-  num get value => _value;
-      set value(num value){
-        _value = value;
+  num _ships;
+  num get ships => _ships;
+      set ships(num value){
+        _ships = value;
         _pointsTextField.text = value.toInt().toString();
       }
   
@@ -21,7 +21,7 @@ class Planet extends Sprite
   }
       
   Planet(x, y, this.radius) {
-    _value = 0;
+    _ships = 0;
     
     this.x = x;
     this.y = y;
@@ -34,7 +34,7 @@ class Planet extends Sprite
     addChild(button);
 
     _pointsTextField = new TextField();
-    _pointsTextField.defaultTextFormat = new TextFormat("Arial", 30, 0x000000, bold:true, align:TextFormatAlign.CENTER);
+    _pointsTextField.defaultTextFormat = new TextFormat("Arial", 16, 0x000000, bold:true, align:TextFormatAlign.CENTER);
     _pointsTextField.width = radius*2;
     _pointsTextField.height = radius*2;
     _pointsTextField.wordWrap = false;
@@ -46,5 +46,9 @@ class Planet extends Sprite
     _pointsTextField.text = "0";
     //_pointsTextField.scaleX = 0.9;
     addChild(_pointsTextField);    
+  }
+  
+  static int compareByShipsAscending(Planet a, Planet b){
+    return a.ships.compareTo(b.ships);
   }
 }

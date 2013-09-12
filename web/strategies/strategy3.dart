@@ -1,13 +1,14 @@
 part of planets;
 
-class Strategy2 extends Strategy{
-  Strategy2();
+class Strategy3 extends Strategy{
+  Strategy3();
   
   List<Order> generateOrders(Player player, Game game){
     
     List<Order> orders = new List<Order>();
     
     var otherPlanets = this.otherPlanets(player, game);
+    
     print("Other planets count: ${otherPlanets.length}");
         
     if(otherPlanets.length > 0){
