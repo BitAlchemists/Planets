@@ -4,9 +4,10 @@ class Game extends Sprite implements Animatable{
   
   ResourceManager _resourceManager;
   Juggler _juggler;
-  List<Planet> bodies;
+  List<Planet> planets;
   List players;
   Map<Player, List<Planet>> _ownerships;
+  List<Ship> _arrivedShips;
   bool _needToUpdatePlanetOwnerships;
   math.Random _random = new math.Random();
   
@@ -24,60 +25,76 @@ class Game extends Sprite implements Animatable{
     background.graphics.fillColor(Color.Black);
     this.addChild(background);
     
-    bodies = [];
+    _reset();
+    
+    _juggler.add(this);
+  }
+  
+  _reset(){
+    if(planets != null)
+    {
+      planets.forEach((Planet planet) => planet.removeFromParent());
+      print("Implement me");
+    }
+    
+    if(_arrivedShips != null){
+      _arrivedShips.forEach((Ship ship) => ship.removeFromParent());
+    }
+    
+    planets = [];
+    _arrivedShips = new List<Ship>();
     
     for(int i = 0; i < 10; i++){
       Planet body = new Planet(_random.nextInt(this.stage.stageWidth), _random.nextInt(this.stage.stageHeight), 20);
+      body.value = _random.nextInt(100);
       body.owner = Player.NoPlayer;
       addChild(body);
-      bodies.add(body);
+      planets.add(body);
     }
     
     Strategy strategy = new Strategy2();
 
     players = [new Player("Player 1", Color.Red, strategy), new Player("Player 2", Color.Blue, strategy), new Player("Player 3", Color.Green, strategy)];
     for(int i = 0; i < players.length; i++) {
-      bodies[i].owner = players[i];
-      bodies[i].value = 10;
+      planets[i].owner = players[i];
+      planets[i].value = 30;
     }
     
-    _updateOwnershipMap();
-    
-    _juggler.add(this);
+    _updateOwnerships();
   }
   
   bool advanceTime(num time){
     //Add units
+    print("adding units");
     players.forEach((Player player) => _ownerships[player].forEach((Planet planet) => planet.value += time));
-
+    
+    //Battles
+    print("battles");
+    _arrivedShips.forEach(_performBattle);
+    _arrivedShips.clear();
+    
     //Create orders
+    print("creating orders");
     List<Order> orders = new List<Order>();
-    players.forEach((Player player) => orders.addAll(player.createOrders(this)));
+    for(Player player in players)
+    {
+      List<Order> playerOrders = player.createOrders(this);
+      orders.addAll(playerOrders);       
+    }
     
     //Execute orders
+    print("executing orders");
     orders.forEach(_launchFleet);
     
     if(_needToUpdatePlanetOwnerships){
-      _updateOwnershipMap();
+      print("updating ownerships");
+      _updateOwnerships();
       _needToUpdatePlanetOwnerships = false;
     }
     
     return true;
   }
-  
-  _updateOwnershipMap(){
-    _ownerships = new Map<Player, List<Planet>>(); 
-    
-    bodies.forEach((Planet body){
-      List<Planet> bodies = _ownerships[body.owner];
-      if(bodies == null){
-        bodies = new List<Planet>();
-        _ownerships[body.owner] = bodies;
-      }
-      bodies.add(body);
-    });
-  }
-  
+
   _launchFleet(Order order){
     num x = order.source.x;
     num y = order.source.y;
@@ -88,7 +105,7 @@ class Game extends Sprite implements Animatable{
     
     for(int i = 0; i < order.unitCount; i++){
       Point sourcePosition = new Point(x + _random.nextDouble()*radius*2-radius, y + _random.nextDouble()*radius*2-radius);
-      Ship ship = new Ship(order.issuer, sourcePosition);
+      Ship ship = new Ship(order.issuer, sourcePosition, destination);
       addChild(ship);
             
       num travelTime = destinationPoint.distanceTo(sourcePosition) / speed;
@@ -96,7 +113,7 @@ class Game extends Sprite implements Animatable{
       tween.animate("x", destinationPoint.x);
       tween.animate("y", destinationPoint.y);
       tween.onComplete = (){
-        _performBattle(ship, destination);
+        _arrivedShips.add(ship);
       };
       renderLoop.juggler.add(tween);
       
@@ -106,8 +123,10 @@ class Game extends Sprite implements Animatable{
     order.source.value -= order.unitCount;
   }
   
-  _performBattle(Ship ship, Planet destination)
+  _performBattle(Ship ship)
   {
+    Planet destination = ship.destination;
+    
     if(destination.owner == ship.owner)
     {
       print("Ship arrives and adds 1 to friendly planet");
@@ -115,7 +134,7 @@ class Game extends Sprite implements Animatable{
     }
     else
     {      
-      if(destination.value <= 0)
+      if(ship.destination.value <= 0)
       {
         print("Ship arrives: Taking over planet");
         destination.owner = ship.owner;
@@ -128,6 +147,35 @@ class Game extends Sprite implements Animatable{
       }
     }
     ship.removeFromParent();
+  }
+ 
+  
+  _updateOwnerships(){
+    _ownerships = new Map<Player, List<Planet>>(); 
+    
+    List<Player> killedPlayers = new List<Player>();
+    List<Player> playersAndNeutral = new List<Player>.from(players);
+    playersAndNeutral.add(Player.NoPlayer);
+    
+    for(Player player in playersAndNeutral){
+      List<Planet> playerPlanets = new List<Planet>();
+      planets.forEach((Planet planet){
+        if(planet.owner == player) {
+          playerPlanets.add(planet); 
+        }
+      });
+      if(playerPlanets.length == 0 && player != Player.NoPlayer)
+      {
+        killedPlayers.add(player);
+        continue;
+      }
+      _ownerships[player] = playerPlanets; 
+    }    
+    
+    for(Player player in killedPlayers){
+      players.remove(player);
+      print("player ${player.name} died");
+    }
   }
   
   Map<Player, List<Planet>> ownerships([List<Player> players = null]) {

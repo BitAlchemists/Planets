@@ -11,13 +11,18 @@ class Strategy2 implements Strategy{
     otherPlayers.remove(player);
     otherPlayers.add(Player.NoPlayer);
     
+    print("Other players count: ${otherPlayers.length}");
+    
     Map<Player, List<Planet>> otherOwnerships = game.ownerships(otherPlayers);
     List<Planet> otherPlanets = new List<Planet>();
     otherOwnerships.forEach((player, planets) => otherPlanets.addAll(planets));
     otherPlanets.sort((Planet a, Planet b) => a.value.compareTo(b.value));
-    Planet body = otherPlanets.first;
     
-    if(body != null){
+    print("Other planets count: ${otherPlanets.length}");
+        
+    if(otherPlanets.length > 0){
+      Planet body = otherPlanets.first;
+      print("${player.name} going to take over a planet of ${body.owner}");
       List<Planet> myPlanets = game.ownerships([player])[player];   
       if(myPlanets != null)
       {
