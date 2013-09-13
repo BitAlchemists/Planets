@@ -9,7 +9,7 @@ abstract class Strategy
     otherPlayers.remove(player);
     otherPlayers.add(Player.NoPlayer);
     
-    print("Other players count: ${otherPlayers.length}");
+    //print("Other players count: ${otherPlayers.length}");
     
     Map<Player, List<Planet>> otherOwnerships = game.ownerships(otherPlayers);
     List<Planet> otherPlanets = new List<Planet>();
@@ -21,5 +21,9 @@ abstract class Strategy
     otherPlanets.sort((Planet a, Planet b) => a.ships.compareTo(b.ships));
 
     return otherPlanets;
+  }
+  
+  List<Planet> myPlanets(Player player, Game game){
+    return game.ownerships([player])[player];
   }
 }

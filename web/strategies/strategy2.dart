@@ -12,7 +12,7 @@ class Strategy2 extends Strategy{
         
     if(otherPlanets.length > 0){
       Planet body = otherPlanets.first;
-      print("${player.name} going to take over a planet of ${body.owner}");
+      //print("${player.name} going to take over a planet of ${body.owner}");
       List<Planet> myPlanets = game.ownerships([player])[player];   
       if(myPlanets != null)
       {

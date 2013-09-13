@@ -17,7 +17,7 @@ class BinStrategy extends Strategy{
     }    
     
     
-    print("${player.name} going to take over a planet of ${_target.owner}");
+    //print("${player.name} going to take over a planet of ${_target.owner}");
     List<Planet> myPlanets = game.ownerships([player])[player];   
     if(myPlanets != null)
     {
@@ -39,7 +39,7 @@ class BinStrategy extends Strategy{
     List<Planet> freePlanets = game.ownerships([Player.NoPlayer])[Player.NoPlayer];
     freePlanets.sort(Planet.compareByShipsAscending);
     
-    print("Free planets count: ${freePlanets.length}");
+    //print("Free planets count: ${freePlanets.length}");
     
     if(freePlanets.length > 0){
       return freePlanets.first;

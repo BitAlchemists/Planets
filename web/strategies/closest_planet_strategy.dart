@@ -1,7 +1,7 @@
 part of planets;
 
-class Strategy3 extends Strategy{
-  Strategy3();
+class ClosestPlanetStrategy extends Strategy{
+  ClosestPlanetStrategy();
   Planet _target;
   
   List<Order> generateOrders(Player player, Game game){
@@ -22,23 +22,26 @@ class Strategy3 extends Strategy{
     {
       var otherPlanets = this.otherPlanets(player, game);
       
-      //we pick a random planet from the lower half of the array
-      int start = (otherPlanets.length/2).round();
-      int end = otherPlanets.length;
-      otherPlanets.removeRange(start, end);
+      List<Planet> myPlanets = this.myPlanets(player, game);
+      Point center = Planet.centerOf(myPlanets);
       
-      print("Other planets count: ${otherPlanets.length}");
+      otherPlanets.sort((Planet a, Planet b){
+        Point pa = new Point(a.x, a.y);
+        Point pb = new Point(b.x, b.y);
+        return pa.distanceTo(center).compareTo(pb.distanceTo(center));
+      });
+      
+      //print("Other planets count: ${otherPlanets.length}");
       
       if(otherPlanets.length > 0)
       {
-        int randomPlanetIndex = new math.Random().nextInt(otherPlanets.length);
-        _target = otherPlanets[randomPlanetIndex];
+        _target = otherPlanets.first;
       }
     }
     
     if(_target != null)
     {
-      print("${player.name} going to take over a planet of ${_target.owner}");
+      //print("${player.name} going to take over a planet of ${_target.owner}");
       List<Planet> myPlanets = game.ownerships([player])[player];   
       if(myPlanets != null)
       {

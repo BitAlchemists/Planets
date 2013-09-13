@@ -12,11 +12,12 @@ class Game extends Sprite implements Animatable{
   bool _needToUpdatePlanetOwnerships;
   math.Random _random = new math.Random();
   
-  final int _planetCount = 100;
-  final num _planetRadius = 10;
-  final num _shipSpeed = 40.0;
+  final int _planetCount = 60;
+  final double _planetRadius = 14.0;
+  final double _shipSpeed = 100.0;
   final int _initialPlayerPlanetUnitCount = 30;
   final int _initialNeutralPlanetUnitCount = 10;
+  final double _shipRadius = 3.0;
   
   Game(ResourceManager resourceManager) {
     _resourceManager = resourceManager;
@@ -26,9 +27,12 @@ class Game extends Sprite implements Animatable{
 
   _onAddedToStage(Event e) {
     _juggler = stage.juggler;
+    
+    int stageWidth = this.stage.stageWidth;
+    int stageHeight = this.stage.stageHeight;
   
     Shape background = new Shape();
-    background.graphics.rect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
+    background.graphics.rect(0, 0, stageWidth, stageHeight);
     background.graphics.fillColor(Color.Black);
     this.addChild(background);
     
@@ -56,41 +60,83 @@ class Game extends Sprite implements Animatable{
     _travelingShips = new List<Ship>();
     
     for(int i = 0; i < _planetCount; i++){
-      Planet body = new Planet(_random.nextInt(this.stage.stageWidth), _random.nextInt(this.stage.stageHeight), _planetRadius);
+      int iRadius = _planetRadius.toInt();
+      Planet body = new Planet(_random.nextInt(this.stage.stageWidth - iRadius*2) + iRadius, _random.nextInt(this.stage.stageHeight - iRadius*2) + iRadius, _planetRadius);
       body.ships = _random.nextInt(_initialNeutralPlanetUnitCount);
       body.owner = Player.NoPlayer;
       addChild(body);
       planets.add(body);
     }
     
+
+    
     Strategy strategy2 = new Strategy2();
-    Strategy strategy3 = new Strategy3();
     Strategy binStrategy = new BinStrategy();
     
-    players = [new Player("Player 1", Color.Red, strategy2), 
-               new Player("Player 2", Color.Blue, strategy2),
-               new Player("Player 3", Color.Yellow, binStrategy),
-               new Player("Player 4", Color.Turquoise, strategy3)];
+    players = [new Player("Player 1", Color.Red, new ClosestPlanetStrategy()), 
+               new Player("Player 2", Color.Blue, new ClosestPlanetStrategy()),
+               new Player("Player 3", Color.Yellow, new ClosestPlanetStrategy()),
+               new Player("Player 4", Color.Turquoise, new ClosestPlanetStrategy()),
+               new Player("Player 5", Color.Green, new ClosestPlanetStrategy())];
+    /*
+    Planet planet;
+    int stageWidth = this.stage.stageWidth;
+    int stageHeight = this.stage.stageHeight;
+    
+    planet = new Planet(_planetRadius, _planetRadius, _planetRadius);
+    planet.ships = _initialPlayerPlanetUnitCount;
+    planet.owner = players[0];
+    addChild(planet);
+    planets.add(planet);
+    
+    planet = new Planet(stageWidth - _planetRadius, _planetRadius, _planetRadius);
+    planet.ships = _initialPlayerPlanetUnitCount;
+    planet.owner = players[1];
+    addChild(planet);
+    planets.add(planet);
+    
+    planet = new Planet(_planetRadius, stageHeight - _planetRadius, _planetRadius);
+    planet.ships = _initialPlayerPlanetUnitCount;
+    planet.owner = players[2];
+    addChild(planet);
+    planets.add(planet);
+    
+    planet = new Planet(stageWidth - _planetRadius, stageHeight - _planetRadius, _planetRadius);
+    planet.ships = _initialPlayerPlanetUnitCount;
+    planet.owner = players[3];
+    addChild(planet);
+    planets.add(planet);
+    
+    planet = new Planet(stageWidth/2, stageHeight/2, _planetRadius);
+    planet.ships = _initialPlayerPlanetUnitCount;
+    planet.owner = players[4];
+    addChild(planet);
+    planets.add(planet);
+    */
+    
     for(int i = 0; i < players.length; i++) {
       planets[i].owner = players[i];
       planets[i].ships = _initialPlayerPlanetUnitCount;
     }
     
+    
     _updateOwnerships();
   }
   
   bool advanceTime(num time){
+    print("live ships:${_travelingShips.length}");
+    
     //Add units
-    print("adding units");
+    //print("adding units");
     players.forEach((Player player) => _ownerships[player].forEach((Planet planet) => planet.ships += time));
     
     //Battles
-    print("battles");
+    //print("battles");
     _arrivedShips.forEach(_performBattle);
     _arrivedShips.clear();
     
     //Create orders
-    print("creating orders");
+    //print("creating orders");
     List<Order> orders = new List<Order>();
     for(Player player in players)
     {
@@ -99,11 +145,11 @@ class Game extends Sprite implements Animatable{
     }
     
     //Execute orders
-    print("executing orders");
+    //print("executing orders");
     orders.forEach(_launchFleet);
     
     if(_needToUpdatePlanetOwnerships){
-      print("updating ownerships");
+      //print("updating ownerships");
       _updateOwnerships();
       _needToUpdatePlanetOwnerships = false;
     }
@@ -127,7 +173,7 @@ class Game extends Sprite implements Animatable{
     
     for(int i = 0; i < order.unitCount; i++){
       Point sourcePosition = new Point(x + _random.nextDouble()*radius*2-radius, y + _random.nextDouble()*radius*2-radius);
-      Ship ship = new Ship(order.issuer, sourcePosition, destination);
+      Ship ship = new Ship(order.issuer, sourcePosition, destination, _shipRadius);
       addChild(ship);
       _travelingShips.add(ship);
             
@@ -141,7 +187,7 @@ class Game extends Sprite implements Animatable{
       };
       renderLoop.juggler.add(tween);
       
-      print("Sending ship to $destinationPoint. travelTime: $travelTime");
+      //print("Sending ship to $destinationPoint. travelTime: $travelTime");
     }
     
     order.source.ships -= order.unitCount;
@@ -153,20 +199,20 @@ class Game extends Sprite implements Animatable{
     
     if(destination.owner == ship.owner)
     {
-      print("Ship arrives and adds 1 to friendly planet");
+      //print("Ship arrives and adds 1 to friendly planet");
       destination.ships += 1;
     }
     else
     {      
       if(ship.destination.ships <= 0)
       {
-        print("Ship arrives: Taking over planet");
+        //print("Ship arrives: Taking over planet");
         destination.owner = ship.owner;
         _needToUpdatePlanetOwnerships = true;
       }
       else
       {
-        print("Ship arrives: Killing a unit");
+        //print("Ship arrives: Killing a unit");
         destination.ships -= 1;
       }
     }

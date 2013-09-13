@@ -51,4 +51,33 @@ class Planet extends Sprite
   static int compareByShipsAscending(Planet a, Planet b){
     return a.ships.compareTo(b.ships);
   }
+  
+  static Point centerOf(List<Planet> planets){
+    double dx = 0.0;
+    double dy = 0.0;
+    for(Planet planet in planets){
+      dx += planet.x;
+      dy += planet.y;
+    }
+    
+    int count = planets.length;
+    return new Point(dx/count, dy/count);
+  }
+  
+  double distanceTo(Planet other){
+    num dx = x - other.x;
+    num dy = y - other.y;
+    return math.sqrt(dx * dx + dy * dy);
+  }
+  
+  /*
+   * 
+   *       //we pick a random planet from the lower half of the array
+      int start = (otherPlanets.length/2).round();
+      int end = otherPlanets.length;
+      otherPlanets.removeRange(start, end);
+              int randomPlanetIndex = new math.Random().nextInt(otherPlanets.length);
+      
+   
+   */
 }
