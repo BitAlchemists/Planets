@@ -34,7 +34,7 @@ class Planet extends Sprite
     addChild(button);
 
     _pointsTextField = new TextField();
-    _pointsTextField.defaultTextFormat = new TextFormat("Arial", 16, 0x000000, bold:true, align:TextFormatAlign.CENTER);
+    _pointsTextField.defaultTextFormat = new TextFormat("Arial", this.radius, 0x000000, bold:true, align:TextFormatAlign.CENTER);
     _pointsTextField.width = radius*2;
     _pointsTextField.height = radius*2;
     _pointsTextField.wordWrap = false;

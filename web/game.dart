@@ -12,11 +12,11 @@ class Game extends Sprite implements Animatable{
   bool _needToUpdatePlanetOwnerships;
   math.Random _random = new math.Random();
   
-  final int _planetCount = 15;
-  final num _planetRadius = 12;
+  final int _planetCount = 100;
+  final num _planetRadius = 10;
   final num _shipSpeed = 40.0;
   final int _initialPlayerPlanetUnitCount = 30;
-  final int _initialNeutralPlanetUnitCount = 100;
+  final int _initialNeutralPlanetUnitCount = 10;
   
   Game(ResourceManager resourceManager) {
     _resourceManager = resourceManager;
